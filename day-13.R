@@ -36,6 +36,8 @@ calcInput <- function(image.data) {
   # message("calcInput in")
   pos.ball <- strsplit(names(image.data)[image.data == 4], ":")[[1]] %>% as.numeric()
   pos.paddle <- strsplit(names(image.data)[image.data == 3], ":")[[1]] %>% as.numeric()
+  if(all(pos.paddle == pos.ball))
+    message("Ball hits paddle")
   input <- case_when(
     pos.ball[1] == pos.paddle[1] ~ 0
     , pos.ball[1] < pos.paddle[1] ~ -1
@@ -144,9 +146,9 @@ computerDay13 <- function(program, offset = 0, output.result = NULL, base = 0, i
       output.result <- c(output.result, as.integer(result))
     }
     if((length(output.result) %% 3) == 0) {
-      message("output (", length(output.result), ") = ", paste(tail(output.result, 3), collapse = ","))
-      if(all(output.result[1:2] == as.integer(c(-1, 0)))) {
-        score <- output.result[3]
+      # message("output (", length(output.result), ") = ", paste(tail(output.result, 3), collapse = ","))
+      if(all(tail(output.result, 3)[1:2] == as.integer(c(-1, 0)))) {
+        score <- tail(output.result, 1)
         message("Update score to ", score)
       } else {
         image.data <- doDraw(image.data, tail(output.result, 3))
@@ -183,8 +185,9 @@ doCompute13 <- function(program) {
     r <- computerDay13(
       program = r$program, offset = r$offset, output.result = r$output, r$base, r$image.data, r$score
     )
-    if((iters %% 1000) == 0)
-      message("iteration ", iters)
+    if((iters %% 1000) == 0){
+      message("iteration ", iters, " n of blocks = ", sum(r$image.data == 2))
+    }
     iters <- iters + 1
     if(iters > 1e8) {
       message("too many iters")
